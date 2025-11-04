@@ -129,22 +129,26 @@ static void _profiler_output_list_print(const size_t index, const size_t max_len
     path[pos++] = '\'';
     const char* unit_symbol;
     double unit_factor;
+    int unit_fraction;
     switch (unit) {
         case NANOSECONDS:
             unit_symbol = "ns";
             unit_factor = 1.0e9;
+            unit_fraction = 0;
             break;
         case MILLISECONDS:
             unit_symbol = "ms";
             unit_factor = 1.0e3;
+            unit_fraction = 6;
             break;
         case SECONDS:
         default:
             unit_symbol = "s";
             unit_factor = 1.0;
+            unit_fraction = 9;
             break;
     }
-    fprintf(stderr, "%s%.9lf %s\n", path, _output_list.items[index].time * unit_factor, unit_symbol);
+    fprintf(stderr, "%s%.*lf %s\n", path, unit_fraction, _output_list.items[index].time * unit_factor, unit_symbol);
     free(path);
 }
 

@@ -4,7 +4,6 @@
 
 int main(int argc, char** argv)
 {
-    change_log_level(DEBUG);
     auto_rebuild(argc, argv);
     Cmd cmd = {0};
     cmd_append(&cmd, "mkdir -p build");
