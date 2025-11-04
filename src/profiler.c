@@ -52,3 +52,17 @@ static void _profiler_clock_stack_free(void)
     _clock_stack = (Profiler_Clock_Stack){0};
 }
 
+static void _profiler_clock_stack_remove(void)
+{
+    if (_clock_stack.count == 0) {
+        return;
+    }
+    Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count--];
+    clock->label = NULL;
+    clock->negin = (struct timespec){0};
+    clock->end = (struct timespec){0};
+    if (_clock_stack.count == 0) {
+        _profiler_clock_stack_free();
+    }
+}
+
