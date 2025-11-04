@@ -7,7 +7,6 @@ int main(int argc, char** argv)
     auto_rebuild(argc, argv);
     Cmd cmd = {0};
     cc(&cmd);
-    cc_std(&cmd, "c11");
     cc_flags(&cmd);
     cc_output(&cmd, "profiler");
     cc_inputs(&cmd, "src/main.c", "src/profiler.c");
