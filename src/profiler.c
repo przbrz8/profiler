@@ -25,6 +25,7 @@ static void _profiler_clock_stack_free(void);
 static void _profiler_clock_stack_remove(void);
 
 static Profiler_Clock_Stack _clock_stack = {0};
+static size_t _longest_clock_label = 0;
 
 #define _PROFILER_CLOCK_STACK_CAPACITY_INCREMENT 8
 static void _profiler_clock_stack_add(void)
@@ -68,6 +69,10 @@ static void _profiler_clock_stack_remove(void)
 
 void profiler_clock_begin(const char* clock_label)
 {
+    if (strlen(clock_label) == 0) {
+        fprintf(stderr, "%s: error: invalid clock label\n", _PROFILER_NAME);
+        return;
+    }
     struct timespec tp;
     if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
         fprintf(stderr, "%s: error: failed to get current monotonic time: %s\n", _PROFILER_NAME, strerror(errno));
@@ -77,13 +82,49 @@ void profiler_clock_begin(const char* clock_label)
     Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
     clock->label = clock_label;
     clock->begin = tp;
+    size_t len = _clock_stack.count - 1;
+    for (size_t i = 0; i < _clock_stack.count; ++i) {
+        len += strlen(_clock_stack.items[i].label);
+    }
+    if (len > _longest_clock_label) {
+        _longest_clock_label = len;
+    }
 }
 
-double profiler_clock_end(void)
+#define _PROFILER_OUTPUT_SPACING 2
+void _profiler_clock_stack_top_output(void)
+{
+    Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
+    double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
+    size_t len = (_longest_clock_label + 2 + _PROFILER_OUTPUT_SPACING);
+    char* path = (char*)malloc(sizeof(*path) * (len + 1));
+    if (!path) {
+        fprintf(stderr, "%s: error: failed to allocate memory for text output\n", _PROFILER_NAME);
+    }
+    path[len] = '\0';
+    fprintf(stderr, "clock: ");
+    size_t pos = 0;
+    for (size_t i = 0; i < len; ++i) {
+        path[i] = '.';
+    }
+    path[pos++] = '\'';
+    for (size_t i = 0; i < _clock_stack.count; ++i) {
+        strcpy(path + pos, _clock_stack.items[i].label);
+        pos += strlen(_clock_stack.items[i].label);
+        if (i < _clock_stack.count - 1) {
+            path[pos++] = '.';
+        }
+    }
+    path[pos++] = '\'';
+    fprintf(stderr, "%s%.9lf s\n", path, time);
+    free(path);
+}
+
+void profiler_clock_end(void)
 {
     if (_clock_stack.count == 0) {
         fprintf(stderr, "%s: error: failed to match 'clock_end' to 'clock_begin'\n", _PROFILER_NAME);
-        return 0.0;
+        return;
     }
     struct timespec tp;
     if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
@@ -92,16 +133,7 @@ double profiler_clock_end(void)
     }
     Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
     clock->end = tp;
-    double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
-    fprintf(stderr, "%s: elapsed: %.9lf[s] on clock '", _PROFILER_NAME, time);
-    for (size_t i = 0; i < _clock_stack.count; ++i) {
-        fprintf(stderr, "%s", _clock_stack.items[i].label);
-        if (i < _clock_stack.count - 1) {
-            fprintf(stderr, ".");
-        }
-    }
-    fprintf(stderr, "'\n");
+    _profiler_clock_stack_top_output();
     _profiler_clock_stack_remove();
-    return time;
 }
 
