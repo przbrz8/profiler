@@ -83,7 +83,7 @@ double profiler_clock_end(void)
 {
     if (_clock_stack.count == 0) {
         fprintf(stderr, "%s: error: failed to match 'clock_end' to 'clock_begin'\n", _PROFILER_NAME);
-        return;
+        return 0.0;
     }
     struct timespec tp;
     if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
@@ -93,7 +93,7 @@ double profiler_clock_end(void)
     Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
     clock->end = tp;
     double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
-    fprintf(stderr, "%s: clock '%s': %lf[s]\n", _PROFILER_NAME, clock->label, time);
+    fprintf(stderr, "%s: elapsed: %.9lf[s] on clock '%s'\n", _PROFILER_NAME, time, clock->label);
     _profiler_clock_stack_remove();
     return time;
 }
