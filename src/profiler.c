@@ -79,3 +79,21 @@ void profiler_clock_begin(const char* clock_label)
     clock->begin = tp;
 }
 
+void profiler_clock_end(void)
+{
+    if (_clock_stack.count == 0) {
+        fprintf(stderr, "%s: error: failed to match 'clock_end' to 'clock_begin'\n", _PROFILER_NAME);
+        return;
+    }
+    struct timespec tp;
+    if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
+        fprintf(stderr, "%s: error: failed to get current monotonic time: %s", _PROFILER_NAME, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
+    clock->end = tp;
+    double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
+    fprintf(stderr, "%s: clock '%s': %lf[s]\n", _PROFILER_NAME, clock->label, time);
+    _profiler_clock_stack_remove();
+}
+
