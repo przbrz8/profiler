@@ -37,7 +37,7 @@ static void _profiler_clock_stack_remove(void);
 
 static void _profiler_output_list_add(void);
 static void _profiler_output_list_free(void);
-static void _profiler_output_list_print(size_t index, size_t max_len);
+static void _profiler_output_list_print(size_t index, size_t max_len, const Profiler_Output_Unit unit);
 
 static Profiler_Clock_Stack _clock_stack = {0};
 static Profiler_Output_List _output_list = {0};
@@ -109,7 +109,7 @@ static void _profiler_output_list_free(void)
 }
 
 #define _PROFILER_OUTPUT_SPACING 2
-static void _profiler_output_list_print(const size_t index, const size_t max_len)
+static void _profiler_output_list_print(const size_t index, const size_t max_len, const Profiler_Output_Unit unit)
 {
     Profiler_Output* output = &_output_list.items[_output_list.count - 1];
     size_t len = (max_len + 2 + _PROFILER_OUTPUT_SPACING);
@@ -127,7 +127,24 @@ static void _profiler_output_list_print(const size_t index, const size_t max_len
     strcpy(path + pos, _output_list.items[index].label);
     pos += strlen(_output_list.items[index].label);
     path[pos++] = '\'';
-    fprintf(stderr, "%s%.9lf s\n", path, _output_list.items[index].time);
+    const char* unit_symbol;
+    double unit_factor;
+    switch (unit) {
+        case PROFILER_NS:
+            unit_symbol = "ns";
+            unit_factor = 1.0e9;
+            break;
+        case PROFILER_MS:
+            unit_symbol = "ms";
+            unit_factor = 1.0e3;
+            break;
+        case PROFILER_S:
+        default:
+            unit_symbol = "s";
+            unit_factor = 1.0;
+            break;
+    }
+    fprintf(stderr, "%s%.9lf %s\n", path, _output_list.items[index].time * unit_factor, unit_symbol);
     free(path);
 }
 
@@ -200,7 +217,7 @@ void profiler_output(const Profiler_Output_Unit unit)
     }
     for (size_t i = 0; i < _output_list.count; ++i) {
         size_t index = (_output_list.count - 1) - i;
-        _profiler_output_list_print(index, max_len);
+        _profiler_output_list_print(index, max_len, unit);
         free(_output_list.items[index].label);
     }
     _profiler_output_list_free();
