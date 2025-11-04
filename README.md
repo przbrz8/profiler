@@ -4,8 +4,8 @@ A lightweight tool for measuring execution time of C code blocks.
 ## Installation
 To install profiler system-wide for linux simply run:
 ```
-$ cc -o cbc cbc.c
-$ sudo ./cbc
+$ cc -o install install.c
+$ ./install
 ```
 ---
 ## Features
@@ -36,6 +36,10 @@ int main(void)
     profiler_clock_end();
     return 0;
 }
+```
+To link with this library use `-lprof` flag in the compilation command
+```
+$ cc -o main main.c -lprof
 ```
 
 
