@@ -20,7 +20,7 @@ Using this library is really simple
 
 #include <stdlib.h>
 
-nt main(void)
+int main(void)
 {
     profiler_clock_begin("total");
     profiler_clock_begin("first loop");
