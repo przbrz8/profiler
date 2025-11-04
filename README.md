@@ -34,7 +34,7 @@ int main(void)
     }
     profiler_clock_end();
     profiler_clock_end();
-    profiler_output(PROFILER_S);
+    profiler_output(SECONDS);
     return 0;
 }
 ```

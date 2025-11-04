@@ -4,14 +4,14 @@
 #include <stddef.h>
 
 typedef enum {
-    PROFILER_S,
-    PROFILER_MS,
-    PROFILER_NS
-} Profiler_Output_Unit;
+    SECONDS,
+    MILLISECONDS,
+    NANOSECONDS
+} Profiler_Units;
 
 void profiler_clock_begin(const char* clock_label);
 void profiler_clock_end(void);
-void profiler_output(const Profiler_Output_Unit unit);
+void profiler_output(const Profiler_Units unit);
 
 #endif // PROFILER_H
 

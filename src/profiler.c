@@ -37,7 +37,7 @@ static void _profiler_clock_stack_remove(void);
 
 static void _profiler_output_list_add(void);
 static void _profiler_output_list_free(void);
-static void _profiler_output_list_print(size_t index, size_t max_len, const Profiler_Output_Unit unit);
+static void _profiler_output_list_print(size_t index, size_t max_len, const Profiler_Units unit);
 
 static Profiler_Clock_Stack _clock_stack = {0};
 static Profiler_Output_List _output_list = {0};
@@ -109,7 +109,7 @@ static void _profiler_output_list_free(void)
 }
 
 #define _PROFILER_OUTPUT_SPACING 2
-static void _profiler_output_list_print(const size_t index, const size_t max_len, const Profiler_Output_Unit unit)
+static void _profiler_output_list_print(const size_t index, const size_t max_len, const Profiler_Units unit)
 {
     Profiler_Output* output = &_output_list.items[_output_list.count - 1];
     size_t len = (max_len + 2 + _PROFILER_OUTPUT_SPACING);
@@ -130,15 +130,15 @@ static void _profiler_output_list_print(const size_t index, const size_t max_len
     const char* unit_symbol;
     double unit_factor;
     switch (unit) {
-        case PROFILER_NS:
+        case NANOSECONDS:
             unit_symbol = "ns";
             unit_factor = 1.0e9;
             break;
-        case PROFILER_MS:
+        case MILLISECONDS:
             unit_symbol = "ms";
             unit_factor = 1.0e3;
             break;
-        case PROFILER_S:
+        case SECONDS:
         default:
             unit_symbol = "s";
             unit_factor = 1.0;
@@ -202,7 +202,7 @@ void profiler_clock_end(void)
     _profiler_clock_stack_remove();
 }
 
-void profiler_output(const Profiler_Output_Unit unit)
+void profiler_output(const Profiler_Units unit)
 {
     if (_output_list.count == 0) {
         fprintf(stderr, "%s: no clocks to output\n", _PROFILER_NAME);
