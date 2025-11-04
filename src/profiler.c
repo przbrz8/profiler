@@ -3,6 +3,10 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
+#define _PROFILER_NAME "profiler"
 
 typedef struct {
     const char* label;
@@ -15,6 +19,10 @@ typedef struct {
     size_t count;
     size_t capacity;
 } Profiler_Clock_Stack;
+
+static void _profiler_clock_stack_add(void);
+static void _profiler_clock_stack_free(void);
+static void _profiler_clock_stack_remove(void);
 
 static Profiler_Clock_Stack _clock_stack = {0};
 
@@ -31,7 +39,7 @@ static void _profiler_clock_stack_add(void)
         }
         Profiler_Clock* items_temp = (Profiler_Clock*)realloc(_clock_stack.items, sizeof(Profiler_Clock) * _clock_stack.capacity);
         if (!items_temp) {
-            fprintf(stderr, "profiler: failed to grow clock stack\n");
+            fprintf(stderr, "%s: failed to grow clock stack\n", _PROFILER_NAME);
             exit(EXIT_FAILURE);
         }
         _clock_stack.items = items_temp;
