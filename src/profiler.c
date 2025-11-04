@@ -198,9 +198,10 @@ void profiler_output(const Profiler_Output_Unit unit)
             max_len = len;
         }
     }
-    for (size_t i = _output_list_count - 1; i >= 0; --i) {
-        _profiler_output_list_print(i, max_len);
-        free(_output_list.items[i].label);
+    for (size_t i = 0; i < _output_list.count; ++i) {
+        size_t index = (_output_list.count - 1) - i;
+        _profiler_output_list_print(index, max_len);
+        free(_output_list.items[index].label);
     }
     _profiler_output_list_free();
 }
