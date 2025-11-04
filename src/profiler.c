@@ -43,3 +43,12 @@ static void _profiler_clock_stack_add(void)
     _clock_stack.items[_clock_stack.count++] = (Profiler_Clock){0};
 }
 
+static void _profiler_clock_stack_free(void)
+{
+    if (_clock_stack.items == NULL) {
+        return;
+    }
+    free(_clock_stack.items);
+    _clock_stack = (Profiler_Clock_Stack){0};
+}
+
