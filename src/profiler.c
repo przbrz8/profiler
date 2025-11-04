@@ -79,7 +79,7 @@ void profiler_clock_begin(const char* clock_label)
     clock->begin = tp;
 }
 
-void profiler_clock_end(void)
+double profiler_clock_end(void)
 {
     if (_clock_stack.count == 0) {
         fprintf(stderr, "%s: error: failed to match 'clock_end' to 'clock_begin'\n", _PROFILER_NAME);
@@ -95,5 +95,6 @@ void profiler_clock_end(void)
     double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
     fprintf(stderr, "%s: clock '%s': %lf[s]\n", _PROFILER_NAME, clock->label, time);
     _profiler_clock_stack_remove();
+    return time;
 }
 

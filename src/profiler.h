@@ -2,7 +2,7 @@
 #define PROFILER_H
 
 void profiler_clock_begin(const char* clock_label);
-void profiler_clock_end(void);
+double profiler_clock_end(void);
 
 #endif // PROFILER_H
 
