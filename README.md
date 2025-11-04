@@ -1,13 +1,42 @@
 # Profiler
+A lightweight tool for measuring execution time of C code blocks.
 ---
-Tool for measuring time of execution of blocks of C code.
----
-## Compilation
-To compile this project simply run:
+## Installation
+To install profiler system-wide for linux simply run:
 ```
 $ cc -o cbc cbc.c
-$ ./cbc
+$ sudo ./cbc
 ```
 ---
+## Features
+- Simple API consisting of only 2 functions
+- Nested clocks
+- Lightweight
+---
 ## Usage
+Using this library is really simple
+```c
+#include "profiler.h"
+
+#include <stdlib.h>
+
+nt main(void)
+{
+    profiler_clock_begin("total");
+    profiler_clock_begin("first loop");
+    for (size_t i = 0; i < 10000000; ++i) {
+        rand();
+    }
+    profiler_clock_end();
+    profiler_clock_begin("second loop");
+    for (size_t i = 0; i < 1000000; ++i) {
+        rand();
+    }
+    profiler_clock_end();
+    profiler_clock_end();
+    return 0;
+}
+```
+
+
 
