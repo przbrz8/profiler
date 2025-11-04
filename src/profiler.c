@@ -93,7 +93,14 @@ double profiler_clock_end(void)
     Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
     clock->end = tp;
     double time = (clock->end.tv_sec - clock->begin.tv_sec) + (clock->end.tv_nsec - clock->begin.tv_nsec) * 1.0e-9;
-    fprintf(stderr, "%s: elapsed: %.9lf[s] on clock '%s'\n", _PROFILER_NAME, time, clock->label);
+    fprintf(stderr, "%s: elapsed: %.9lf[s] on clock '", _PROFILER_NAME, time);
+    for (size_t i = 0; i < _clock_stack.count; ++i) {
+        fprintf(stderr, "%s", _clock_stack.items[i].label);
+        if (i < _clock_stack.count - 1) {
+            fprintf(stderr, ".");
+        }
+    }
+    fprintf(stderr, "'\n");
     _profiler_clock_stack_remove();
     return time;
 }
