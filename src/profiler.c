@@ -26,25 +26,20 @@ static void _profiler_clock_stack_remove(void);
 
 static Profiler_Clock_Stack _clock_stack = {0};
 
-#define _PROFILER_CLOCK_STACK_CAPACITY_INIT 8
-#define _PROFILER_CLOCK_STACK_CAPACITY_GROW 2
+#define _PROFILER_CLOCK_STACK_CAPACITY_INCREMENT 8
 static void _profiler_clock_stack_add(void)
 {
-    if (_clock_stack.capacity <= _clock_stack.count) {
-        if (_clock_stack.capacity == 0) {
-            _clock_stack.capacity = _PROFILER_CLOCK_STACK_CAPACITY_INIT;
-        }
-        else {
-            _clock_stack.capacity *= _PROFILER_CLOCK_STACK_CAPACITY_GROW;
-        }
-        Profiler_Clock* items_temp = (Profiler_Clock*)realloc(_clock_stack.items, sizeof(Profiler_Clock) * _clock_stack.capacity);
-        if (!items_temp) {
+    if (_clock_stack.capacity == _clock_stack.count) {
+        size_t new_capacity = _clock_stack.capacity + _PROFILER_CLOCK_STACK_CAPACITY_INCREMENT;
+        Profiler_Clock* new_items = (Profiler_Clock*)realloc(_clock_stack.items, sizeof(*new_items) * new_capacity);
+        if (!new_items) {
             fprintf(stderr, "%s: failed to grow clock stack\n", _PROFILER_NAME);
+            _profiler_clock_stack_free();
             exit(EXIT_FAILURE);
         }
-        _clock_stack.items = items_temp;
+        _clock_stack.items = new_items;
+        _clock_stack.capacity = new_capacity;
     }
-    Profiler_Clock clock = {0};
-    _clock_stack.items[_clock_stack.count++] = clock;
+    _clock_stack.items[_clock_stack.count++] = (Profiler_Clock){0};
 }
 
