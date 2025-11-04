@@ -9,7 +9,7 @@ $ ./install
 ```
 ---
 ## Features
-- Simple API consisting of only 2 functions
+- Simple API
 - Nested clocks
 - Lightweight
 ---
