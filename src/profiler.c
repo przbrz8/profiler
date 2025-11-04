@@ -57,7 +57,7 @@ static void _profiler_clock_stack_remove(void)
     if (_clock_stack.count == 0) {
         return;
     }
-    Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count--];
+    Profiler_Clock* clock = &_clock_stack.items[--_clock_stack.count];
     clock->label = NULL;
     clock->begin = (struct timespec){0};
     clock->end = (struct timespec){0};
@@ -70,7 +70,7 @@ void profiler_clock_begin(const char* clock_label)
 {
     struct timespec tp;
     if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
-        fprintf(stderr, "%s: error: failed to get current monotonic time: %s", _PROFILER_NAME, strerror(errno));
+        fprintf(stderr, "%s: error: failed to get current monotonic time: %s\n", _PROFILER_NAME, strerror(errno));
         exit(EXIT_FAILURE);
     }
     _profiler_clock_stack_add();
@@ -87,7 +87,7 @@ void profiler_clock_end(void)
     }
     struct timespec tp;
     if (clock_gettime(CLOCK_MONOTONIC, &tp) < 0) {
-        fprintf(stderr, "%s: error: failed to get current monotonic time: %s", _PROFILER_NAME, strerror(errno));
+        fprintf(stderr, "%s: error: failed to get current monotonic time: %s\n", _PROFILER_NAME, strerror(errno));
         exit(EXIT_FAILURE);
     }
     Profiler_Clock* clock = &_clock_stack.items[_clock_stack.count - 1];
